@@ -32,7 +32,16 @@ class MLP:
         self.biases.append(b3)
 
     def feedforward(self, x):
-        pass
+        # Define activation function : currently hard-coded as sigmoid function
+        sigmoid = lambda el : 1.0 / (1.0 + np.exp(el))
+
+        # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
+        for i in range(len(self.weights)):
+            x = np.apply_along_axis(sigmoid, 1, x @ self.weights[i] + self.biases[i])
+
+        # Return the output of the last-layer    
+        return x
+        
 
     def getAllLayers(self):
         return self.weights, self.biases
