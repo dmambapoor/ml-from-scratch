@@ -19,11 +19,11 @@ class Tester:
         for i in range(len(weights)):
             assert weights[i].shape == ans[i]
 
-    @pytest.mark.parametrize("x_shift, y_shift", 
-                             [(0.1, 0.1), 
-                             (0.9, 0.9), 
-                             (0.1, 0.9),
-                             (0.9, 0.1)])
+    @pytest.mark.parametrize("x_shift, y_shift",
+                             [(0.1, 0.1),
+                              (0.9, 0.9),
+                              (0.1, 0.9),
+                              (0.9, 0.1)])
     def test_feedforward(self, x_shift, y_shift):
         model = MLP()
         tolerance = 1e-5

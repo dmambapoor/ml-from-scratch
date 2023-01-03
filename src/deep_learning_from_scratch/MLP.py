@@ -57,7 +57,7 @@ class MLP:
             for i in range(len(sum_d_weights)):
                 self.weights[i] += (sum_d_weights[i] / x.shape[0]) * self.learning_rate
                 self.biases[i] += (sum_d_biases[i] / x.shape[0]) * self.learning_rate
-            
+
             p_cost = c_cost
             c_cost = self.cost(x, y)
             if c_cost > p_cost:
@@ -74,7 +74,7 @@ class MLP:
                 learning_rate /= 10
                 p_cost = c_cost
                 groove_cost = c_cost
-            
+
     def cost(self, x, y):
         total_cost = 0
         for i in range(x.shape[0]):
