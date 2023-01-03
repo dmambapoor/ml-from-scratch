@@ -23,7 +23,20 @@ class Tester:
         x = np.zeros(shape=(10, 150))
         y = np.zeros(shape=(10, 1))
         model.fit(x, y)
-        assert model.feedforward(x)[0][0] == 0.5
+        model.forwardPropagation(x)
+        assert model.forwardPropagation(x)[0][0] == 0.5
+
+    def test_backprop(self):
+        model = MLP()
+        x = np.zeros(shape=(1, 150))
+        y = np.zeros(shape=(1, 1))
+        model.fit(x, y)
+        weights, biases = model.getAllLayers()
+        d_weights, d_biases = model.backPropagation(x, y[0])
+
+        for i in range(len(weights)):
+            assert weights[i].shape == d_weights[i].shape
+            assert biases[i].shape == d_biases[i].shape
 
     def test_square(self):
         model = MLP()
