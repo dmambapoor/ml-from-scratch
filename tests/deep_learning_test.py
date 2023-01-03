@@ -1,10 +1,11 @@
 import numpy as np
+import pytest
 from deep_learning_from_scratch.MLP import MLP
 
 
 class Tester:
 
-    def test_init(self):
+    def test_fit(self):
         model = MLP()
         x = np.zeros(shape=(10, 150))
         y = np.zeros(shape=(10, 1))
@@ -18,21 +19,27 @@ class Tester:
         for i in range(len(weights)):
             assert weights[i].shape == ans[i]
 
-    def test_feedforward(self):
+    @pytest.mark.parametrize("x_shift, y_shift", 
+                             [(0.1, 0.1), 
+                             (0.9, 0.9), 
+                             (0.1, 0.9),
+                             (0.9, 0.1)])
+    def test_feedforward(self, x_shift, y_shift):
         model = MLP()
-        x = np.zeros(shape=(10, 150))
-        y = np.zeros(shape=(10, 1))
+        tolerance = 1e-5
+        x = np.zeros(shape=(10, 150)) + x_shift
+        y = np.zeros(shape=(10, 1)) + y_shift
         model.fit(x, y)
         model.forwardPropagation(x)
-        assert model.forwardPropagation(x)[0][0] == 0.5
+        assert model.cost(x, y) <= tolerance
 
     def test_backprop(self):
         model = MLP()
         x = np.zeros(shape=(1, 150))
         y = np.zeros(shape=(1, 1))
-        model.fit(x, y)
+        model.init_model(x.shape, y.shape)
         weights, biases = model.getAllLayers()
-        d_weights, d_biases = model.backPropagation(x, y[0])
+        d_weights, d_biases = model.backPropagation(x, y)
 
         for i in range(len(weights)):
             assert weights[i].shape == d_weights[i].shape

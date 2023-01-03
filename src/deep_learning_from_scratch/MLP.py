@@ -6,13 +6,13 @@ class MLP:
     def __init__(self):
         pass
 
-    def fit(self, x: np.ndarray, y: np.ndarray):
-        # Construct multi-layer perceptron
-
-        # Add two hidden layers and one final layer consisting of only one node.
-
+    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, max_iterations=100):
         # Determine the sizes of the layers and biases -> add them to the array of layers
-        self.n_inputs = x.shape[1]
+        self.n_inputs = x_shape[1]
+        self.learning_rate = learning_rate
+        self.regularization = regularization
+        self.max_iterations = max_iterations
+        self.num_layers = 4
         self.weights = []
         self.biases = []
 
@@ -26,12 +26,61 @@ class MLP:
         b2 = np.zeros(shape=(1, w2.shape[1]))
         self.biases.append(b2)
 
-        w3 = np.zeros(shape=(w2.shape[1], 1))
+        w3 = np.zeros(shape=(w2.shape[1], y_shape[1]))
         self.weights.append(w3)
-        b3 = np.zeros(shape=(w3.shape[1], 1))
+        b3 = np.zeros(shape=(w3.shape[1], y_shape[1]))
         self.biases.append(b3)
 
-        self.num_layers = 4
+    # Construct and train the multi-layer perceptrons
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, max_iterations=100, tolerance=1e-5):
+        # Add two hidden layers and one final layer consisting of only one node.
+        self.init_model(x.shape, y.shape, learning_rate, regularization)
+
+        # ----MAIN_LEARNING_LOOP-----
+        c_cost = self.cost(x, y)
+        p_cost = c_cost
+        groove_cost = c_cost
+        failed_iterations = 0
+        total_failed_iterations = 0
+        while c_cost > tolerance:
+            sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
+            sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
+            # Sum all the derivatives of the weights and biases
+            for i in range(len(x)):
+                d_weights, d_biases = self.backPropagation(np.atleast_2d(x[i]), np.atleast_2d(y[i]))
+                for i in range(len(sum_d_weights)):
+                    sum_d_weights[i] += d_weights[i]
+                    sum_d_biases[i] += d_biases[i]
+
+            # Subtract the average of the derivatives above from the weights.
+            # This is gradient descent.
+            for i in range(len(sum_d_weights)):
+                self.weights[i] += (sum_d_weights[i] / x.shape[0]) * self.learning_rate
+                self.biases[i] += (sum_d_biases[i] / x.shape[0]) * self.learning_rate
+            
+            p_cost = c_cost
+            c_cost = self.cost(x, y)
+            if c_cost > p_cost:
+                failed_iterations += 1
+                total_failed_iterations += 1
+            if failed_iterations > 10:
+                learning_rate /= 10
+                p_cost = c_cost
+                groove_cost = c_cost
+                failed_iterations = 0
+            if failed_iterations > 1000:
+                break
+            if c_cost < (groove_cost // 10):
+                learning_rate /= 10
+                p_cost = c_cost
+                groove_cost = c_cost
+            
+    def cost(self, x, y):
+        total_cost = 0
+        for i in range(x.shape[0]):
+            total_cost += (self.forwardPropagation(np.atleast_2d(x[i])) - y[i]) ** 2
+        total_cost /= x.shape[0]
+        return total_cost
 
     def forwardPropagation(self, x):
         # Define activation function : currently hard-coded as sigmoid function
@@ -47,7 +96,6 @@ class MLP:
 
     def backPropagation(self, x: np.ndarray, y: np.ndarray):
         # Forward propogation to store activations, and linear weight combinations
-        print(x.shape)
         activations = [x]
         zs = []
         d_weights = [np.zeros(shape=i.shape) for i in self.weights]
@@ -65,17 +113,14 @@ class MLP:
             zs.append(activations[i] @ self.weights[i] + self.biases[i])
             activations.append(np.apply_along_axis(sigmoid, 1, zs[i]))
 
-        # Define loss function : currently hard-coded as sigmoid function
-        def cost(y, pred_y):
-            return (pred_y - y) ** 2
-
+        # Define derivative of loss function : currently hard-coded as sigmoid function
         def d_cost(y, pred_y):
             return 2 * (pred_y - y)
 
         # Set the derivatives of the last set of weights
         d_biases[-1] = d_cost(y, activations[-1]) @ d_sigmoid(zs[-1])
         d_weights[-1] = activations[-2].transpose() @ d_biases[-1]
-        print(d_cost(y, activations[-1]).shape, d_sigmoid(zs[-2]).shape, d_weights[-1].shape, d_biases[-1].shape, self.weights[-1].shape)
+
         for i in range(2, self.num_layers):
             d_biases[-i] = (d_biases[-i + 1] @ self.weights[-i + 1].transpose()) * d_sigmoid(zs[-i])
             d_weights[-i] = activations[-i - 1].transpose() @ d_biases[-i]
