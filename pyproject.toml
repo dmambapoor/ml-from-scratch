@@ -27,7 +27,7 @@ tox = "^4.1.1"
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
-    "--cov=deep_learning_from_scratch",
+    "--cov=ml_from_scratch",
 ]
 testpaths = [
     "tests"

@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from deep_learning_from_scratch.MLP import MLP
+from ml_from_scratch.MLP import MLP
 
 
 class Tester:
