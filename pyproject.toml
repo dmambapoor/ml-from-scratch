@@ -1,28 +1,6 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-name = "ml_from_scratch"
-version = "0.10"
-description = "A deep learning library using only pandas and numpy."
-authors = ["Dhruva Mambapoor"]
-readme = "README.md"
-packages = [{include = "src/*"}]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-pandas = "^1.5.2"
-numpy = "^1.24.1"
-matplotlib = "^3.6.2"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.0"
-pytest-cov = "^4.0.0"
-mypy = "^0.991"
-flake8 = "^6.0.0"
-tox = "^4.1.1"
-
+requires = ["setuptools>=58.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 addopts = [
@@ -32,4 +10,3 @@ addopts = [
 testpaths = [
     "tests"
 ]
-pythonpath = "src"

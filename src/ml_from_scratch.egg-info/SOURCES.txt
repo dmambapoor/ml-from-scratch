@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/ml_from_scratch/MLP.py
+src/ml_from_scratch/__init__.py
+src/ml_from_scratch.egg-info/PKG-INFO
+src/ml_from_scratch.egg-info/SOURCES.txt
+src/ml_from_scratch.egg-info/dependency_links.txt
+src/ml_from_scratch.egg-info/not-zip-safe
+src/ml_from_scratch.egg-info/requires.txt
+src/ml_from_scratch.egg-info/top_level.txt

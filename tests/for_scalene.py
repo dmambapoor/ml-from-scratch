@@ -5,4 +5,3 @@ model.test_feedforward(0.1, 0.1)
 model.test_feedforward(0.1, 0.9)
 model.test_feedforward(0.9, 0.1)
 model.test_feedforward(0.9, 0.9)
-

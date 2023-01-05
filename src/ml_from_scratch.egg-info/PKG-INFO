@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: ml-from-scratch
+Version: 0.0.0
+Summary: A deep learning library using only pandas and numpy.
+Author: Dhruva Mambapoor
+Requires-Python: >=3.10
