@@ -19,19 +19,19 @@ class MLP:
         if random_state: 
             np.random.seed(random_state)
 
-        w1 = np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50))
+        w1 = np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50)) - 0.5
         self.weights.append(w1)
-        b1 = np.random.rand(1, w1.shape[1])
+        b1 = np.random.rand(1, w1.shape[1]) - 0.5
         self.biases.append(b1)
 
-        w2 = np.random.rand(w1.shape[1], w1.shape[1]//2 + 1)
+        w2 = np.random.rand(w1.shape[1], w1.shape[1]//2 + 1) - 0.5
         self.weights.append(w2)
-        b2 = np.random.rand(1, w2.shape[1])
+        b2 = np.random.rand(1, w2.shape[1]) - 0.5
         self.biases.append(b2)
 
-        w3 = np.random.rand(w2.shape[1], y_shape[1])
+        w3 = np.random.rand(w2.shape[1], y_shape[1]) - 0.5
         self.weights.append(w3)
-        b3 = np.random.rand(w3.shape[1], y_shape[1])
+        b3 = np.random.rand(w3.shape[1], y_shape[1]) - 0.5
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
