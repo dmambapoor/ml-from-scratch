@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import sys
 from ml_from_scratch.MLP import MLP
 
 
@@ -15,8 +14,6 @@ class Tester:
         ans = [(150, 50),
                (50, 26),
                (26, 1)]
-        #print(len(weights))
-        #print(len(biases))
         for i in range(len(weights)):
             assert weights[i].shape == ans[i]
 

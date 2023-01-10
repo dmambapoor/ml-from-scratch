@@ -16,7 +16,7 @@ class MLP:
         self.weights = []
         self.biases = []
 
-        if random_state: 
+        if random_state:
             np.random.seed(random_state)
 
         w1 = (np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50)) - 0.5) * 10
@@ -78,13 +78,12 @@ class MLP:
             if failed_iterations > failed_iterations_threshold:
                 self.learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
-                groove_cost = c_cost
                 failed_iterations = 0
                 if verbose:
-                    print("ITERATION #%i: Failed to improve. Reducing learning rate." %(iteration_num))
+                    print("ITERATION #%i: Failed to improve. Reducing learning rate." % (iteration_num))
             if failed_iterations >= (max_iterations / failed_iterations_threshold):
                 break
-            
+
             # Update iteration number
             iteration_num += 1
         if verbose:
@@ -93,7 +92,7 @@ class MLP:
             elif iteration_num >= max_iterations:
                 print("Max_iterations achieved. Stopping training.")
             elif failed_iterations > 1000:
-                print("Failed to improve too many times. Quitting learning." %(iteration_num))
+                print("Failed to improve too many times. Quitting learning.")
 
     def cost(self, x, y):
         total_cost = 0
