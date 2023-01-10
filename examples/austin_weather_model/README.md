@@ -6,7 +6,7 @@ This model takes NOAA data from Austin Bergstrom Airport. It uses data from some
 * daily temperature low
 * daily precipitation
 
-This model uses the [MLP](src/ml_from_scratch/MLP.py) model from the src folder.
+This model uses the [MLP](../../src/ml_from_scratch/MLP.py) model from the src folder.
 
 ## How to run the model
 1. Clone the repo or download the examples folder.
