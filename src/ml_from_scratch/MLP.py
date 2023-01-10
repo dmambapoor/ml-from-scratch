@@ -35,9 +35,9 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, max_iterations=100, tolerance=1e-4, verbose=False):
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False):
         # Add two hidden layers and one final layer consisting of only one node.
-        self.init_model(x.shape, y.shape, learning_rate, regularization)
+        self.init_model(x.shape, y.shape, learning_rate, regularization, random_state)
 
         # ----MAIN_LEARNING_LOOP-----
 
