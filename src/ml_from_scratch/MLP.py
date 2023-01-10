@@ -19,19 +19,19 @@ class MLP:
         if random_state: 
             np.random.seed(random_state)
 
-        w1 = np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50)) - 0.5
+        w1 = (np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50)) - 0.5) * 10
         self.weights.append(w1)
-        b1 = np.random.rand(1, w1.shape[1]) - 0.5
+        b1 = (np.random.rand(1, w1.shape[1]) - 0.5) * 10
         self.biases.append(b1)
 
-        w2 = np.random.rand(w1.shape[1], w1.shape[1]//2 + 1) - 0.5
+        w2 = (np.random.rand(w1.shape[1], w1.shape[1]//2 + 1) - 0.5)*10
         self.weights.append(w2)
-        b2 = np.random.rand(1, w2.shape[1]) - 0.5
+        b2 = (np.random.rand(1, w2.shape[1]) - 0.5)*10
         self.biases.append(b2)
 
-        w3 = np.random.rand(w2.shape[1], y_shape[1]) - 0.5
+        w3 = (np.random.rand(w2.shape[1], y_shape[1]) - 0.5)*10
         self.weights.append(w3)
-        b3 = np.random.rand(w3.shape[1], y_shape[1]) - 0.5
+        b3 = (np.random.rand(w3.shape[1], y_shape[1]) - 0.5)*10
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
@@ -74,8 +74,8 @@ class MLP:
             if c_cost >= p_cost:
                 failed_iterations += 1
                 total_failed_iterations += 1
-            if failed_iterations > 10:
-                learning_rate /= 10
+            if failed_iterations > 2:
+                learning_rate /= 2
                 p_cost = c_cost
                 groove_cost = c_cost
                 failed_iterations = 0
@@ -135,7 +135,7 @@ class MLP:
 
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
-            zs.append(np.add(activations[i] @ self.weights[i], self.biases[i]))
+            zs.append(np.add(np.matmul(activations[i], self.weights[i]), self.biases[i]))
             activations.append(np.apply_along_axis(sigmoid, 1, zs[i]))
 
         # Define derivative of loss function : currently hard-coded as sigmoid function
@@ -143,12 +143,12 @@ class MLP:
             return 2 * (pred_y - y)
 
         # Set the derivatives of the last set of weights
-        d_biases[-1] = d_cost(y, activations[-1]) @ d_sigmoid(zs[-1])
-        d_weights[-1] = activations[-2].transpose() @ d_biases[-1]
+        d_biases[-1] = np.matmul(d_cost(y, activations[-1]), d_sigmoid(zs[-1]))
+        d_weights[-1] = np.matmul(activations[-2].transpose(), d_biases[-1])
 
         for i in range(2, self.num_layers):
-            d_biases[-i] = (d_biases[-i + 1] @ self.weights[-i + 1].transpose()) * d_sigmoid(zs[-i])
-            d_weights[-i] = activations[-i - 1].transpose() @ d_biases[-i]
+            d_biases[-i] = np.matmul(d_biases[-i + 1], self.weights[-i + 1].transpose()) * d_sigmoid(zs[-i])
+            d_weights[-i] = np.matmul(activations[-i - 1].transpose(), d_biases[-i])
         return d_weights, d_biases
 
     def getAllLayers(self):
