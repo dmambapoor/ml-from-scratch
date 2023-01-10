@@ -44,8 +44,9 @@ class MLP:
         # Initialize vars
         c_cost = self.cost(x, y)
         p_cost = c_cost
-        groove_cost = c_cost
         failed_iterations = 0
+        failed_iterations_threshold = 2
+        failed_iterations_punishment = 2
         total_failed_iterations = 0
         iteration_num = 0
 
@@ -74,21 +75,15 @@ class MLP:
             if c_cost >= p_cost:
                 failed_iterations += 1
                 total_failed_iterations += 1
-            if failed_iterations > 2:
-                learning_rate /= 2
+            if failed_iterations > failed_iterations_threshold:
+                learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
                 groove_cost = c_cost
                 failed_iterations = 0
                 if verbose:
                     print("ITERATION #%i: Failed to improve. Reducing learning rate." %(iteration_num))
-            if failed_iterations > 1000:
+            if failed_iterations >= (max_iterations / failed_iterations_threshold):
                 break
-            if c_cost < (groove_cost / 10):
-                learning_rate /= 10
-                p_cost = c_cost
-                groove_cost = c_cost
-                if verbose:
-                    print("ITERATION #%i: Failed to improve significantly. Reducing learning rate." %(iteration_num))
             
             # Update iteration number
             iteration_num += 1
