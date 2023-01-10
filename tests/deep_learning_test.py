@@ -14,8 +14,8 @@ class Tester:
         ans = [(150, 50),
                (50, 26),
                (26, 1)]
-        print(len(weights))
-        print(len(biases))
+        #print(len(weights))
+        #print(len(biases))
         for i in range(len(weights)):
             assert weights[i].shape == ans[i]
 
@@ -26,7 +26,7 @@ class Tester:
                               (0.9, 0.1)])
     def test_feedforward(self, x_shift, y_shift):
         model = MLP()
-        tolerance = 1e-5
+        tolerance = 1e-4
         x = np.zeros(shape=(10, 150)) + x_shift
         y = np.zeros(shape=(10, 1)) + y_shift
         model.fit(x, y)

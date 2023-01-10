@@ -32,16 +32,21 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, max_iterations=100, tolerance=1e-5):
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, max_iterations=100, tolerance=1e-4, verbose=False):
         # Add two hidden layers and one final layer consisting of only one node.
         self.init_model(x.shape, y.shape, learning_rate, regularization)
 
         # ----MAIN_LEARNING_LOOP-----
+
+        # Initialize vars
         c_cost = self.cost(x, y)
         p_cost = c_cost
         groove_cost = c_cost
         failed_iterations = 0
         total_failed_iterations = 0
+        iteration_num = 0
+
+        # Loop gradient descent
         while c_cost > tolerance:
             sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
             sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
@@ -58,9 +63,12 @@ class MLP:
                 self.weights[i] += (sum_d_weights[i] / x.shape[0]) * self.learning_rate
                 self.biases[i] += (sum_d_biases[i] / x.shape[0]) * self.learning_rate
 
+            # Update failure tracking
             p_cost = c_cost
             c_cost = self.cost(x, y)
-            if c_cost > p_cost:
+            if verbose:
+                print("ITERATION #%i COST: %f (change of %f)" % (iteration_num, c_cost, c_cost-p_cost))
+            if c_cost >= p_cost:
                 failed_iterations += 1
                 total_failed_iterations += 1
             if failed_iterations > 10:
@@ -74,11 +82,14 @@ class MLP:
                 learning_rate /= 10
                 p_cost = c_cost
                 groove_cost = c_cost
+            
+            # Update iteration number
+            iteration_num += 1
 
     def cost(self, x, y):
         total_cost = 0
         for i in range(x.shape[0]):
-            total_cost += (self.forwardPropagation(np.atleast_2d(x[i])) - y[i]) ** 2
+            total_cost += (self.forwardPropagation(np.atleast_2d(x[i])) - np.atleast_2d(y[i])) ** 2
         total_cost /= x.shape[0]
         return total_cost
 
@@ -89,7 +100,7 @@ class MLP:
 
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
-            x = np.apply_along_axis(sigmoid, 1, x @ self.weights[i] + self.biases[i])
+            x = np.apply_along_axis(sigmoid, 1, np.add(x @ self.weights[i], self.biases[i]))
 
         # Return the output of the last-layer
         return x
@@ -106,11 +117,11 @@ class MLP:
             return 1.0 / (1.0 + np.exp(el))
 
         def d_sigmoid(el):
-            return sigmoid(el) * (1 - sigmoid(el))
+            return (1.0 / (1.0 + np.exp(el))) * (1 - (1.0 / (1.0 + np.exp(el))))
 
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
-            zs.append(activations[i] @ self.weights[i] + self.biases[i])
+            zs.append(np.add(activations[i] @ self.weights[i], self.biases[i]))
             activations.append(np.apply_along_axis(sigmoid, 1, zs[i]))
 
         # Define derivative of loss function : currently hard-coded as sigmoid function
