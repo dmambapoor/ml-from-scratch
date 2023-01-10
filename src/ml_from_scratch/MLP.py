@@ -6,7 +6,7 @@ class MLP:
     def __init__(self):
         pass
 
-    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, max_iterations=100):
+    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, max_iterations=100, random_state=None):
         # Determine the sizes of the layers and biases -> add them to the array of layers
         self.n_inputs = x_shape[1]
         self.learning_rate = learning_rate
@@ -16,19 +16,22 @@ class MLP:
         self.weights = []
         self.biases = []
 
-        w1 = np.zeros(shape=(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50)))
+        if random_state: 
+            np.random.seed(random_state)
+
+        w1 = np.random.rand(self.n_inputs, (self.n_inputs//2 + 1 if self.n_inputs//2 < 50 else 50))
         self.weights.append(w1)
-        b1 = np.zeros(shape=(1, w1.shape[1]))
+        b1 = np.random.rand(1, w1.shape[1])
         self.biases.append(b1)
 
-        w2 = np.zeros(shape=(w1.shape[1], w1.shape[1]//2 + 1))
+        w2 = np.random.rand(w1.shape[1], w1.shape[1]//2 + 1)
         self.weights.append(w2)
-        b2 = np.zeros(shape=(1, w2.shape[1]))
+        b2 = np.random.rand(1, w2.shape[1])
         self.biases.append(b2)
 
-        w3 = np.zeros(shape=(w2.shape[1], y_shape[1]))
+        w3 = np.random.rand(w2.shape[1], y_shape[1])
         self.weights.append(w3)
-        b3 = np.zeros(shape=(w3.shape[1], y_shape[1]))
+        b3 = np.random.rand(w3.shape[1], y_shape[1])
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
@@ -47,7 +50,7 @@ class MLP:
         iteration_num = 0
 
         # Loop gradient descent
-        while c_cost > tolerance:
+        while c_cost > tolerance and iteration_num < max_iterations:
             sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
             sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
             # Sum all the derivatives of the weights and biases
@@ -76,15 +79,26 @@ class MLP:
                 p_cost = c_cost
                 groove_cost = c_cost
                 failed_iterations = 0
+                if verbose:
+                    print("ITERATION #%i: Failed to improve. Reducing learning rate." %(iteration_num))
             if failed_iterations > 1000:
                 break
-            if c_cost < (groove_cost // 10):
+            if c_cost < (groove_cost / 10):
                 learning_rate /= 10
                 p_cost = c_cost
                 groove_cost = c_cost
+                if verbose:
+                    print("ITERATION #%i: Failed to improve significantly. Reducing learning rate." %(iteration_num))
             
             # Update iteration number
             iteration_num += 1
+        if verbose:
+            if c_cost <= tolerance:
+                print("Cost lower than tolerance. Stopping training.")
+            elif iteration_num >= max_iterations:
+                print("Max_iterations achieved. Stopping training.")
+            elif failed_iterations > 1000:
+                print("Failed to improve too many times. Quitting learning." %(iteration_num))
 
     def cost(self, x, y):
         total_cost = 0
