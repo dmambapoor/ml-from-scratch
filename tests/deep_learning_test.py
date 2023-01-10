@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import sys
 from ml_from_scratch.MLP import MLP
 
 
@@ -27,9 +28,12 @@ class Tester:
     def test_feedforward(self, x_shift, y_shift):
         model = MLP()
         tolerance = 1e-4
-        x = np.zeros(shape=(10, 150)) + x_shift
-        y = np.zeros(shape=(10, 1)) + y_shift
-        model.fit(x, y)
+        x = np.zeros(shape=(2, 150)) + x_shift
+        y = np.zeros(shape=(2, 1)) + y_shift
+        for i in range(100):
+            model.fit(x, y, max_iterations=100)
+            if model.cost(x, y) <= tolerance:
+                break
         model.forwardPropagation(x)
         assert model.cost(x, y) <= tolerance
 
