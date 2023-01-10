@@ -76,7 +76,7 @@ class MLP:
                 failed_iterations += 1
                 total_failed_iterations += 1
             if failed_iterations > failed_iterations_threshold:
-                learning_rate /= failed_iterations_punishment
+                self.learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
                 groove_cost = c_cost
                 failed_iterations = 0
