@@ -40,7 +40,7 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False):
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False, failed_iterations_threshold=1000, failed_iterations_punishment=2):
         # Add two hidden layers and one final layer consisting of only one node.
         self.init_model(x.shape, y.shape, learning_rate=learning_rate, regularization=regularization, batch_size=batch_size, max_iterations=max_iterations, random_state=random_state, verbose=verbose)
 
@@ -50,14 +50,12 @@ class MLP:
         c_cost = self.cost(x, y)
         p_cost = c_cost
         failed_iterations = 0
-        failed_iterations_threshold = 1000
-        failed_iterations_punishment = 2
         iteration_num = 0
 
         # Loop gradient descent
         while c_cost > self.tolerance and iteration_num < self.max_iterations:
             # Take a gradient descent step if we're slowing down
-            if p_cost - c_cost < (tolerance / self.max_iterations):
+            if p_cost - c_cost < (tolerance):
                 self.gradient_descent_step(x, y)
             else:
                 self.stochastic_gradient_descent_step(x, y)
@@ -69,6 +67,8 @@ class MLP:
                 print("ITERATION #%i COST: %f (change of %f)" % (iteration_num, c_cost, c_cost-p_cost))
             if c_cost >= p_cost:
                 failed_iterations += 1
+            elif failed_iterations >= 1:
+                failed_iterations=0
             if failed_iterations > failed_iterations_threshold:
                 self.learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
