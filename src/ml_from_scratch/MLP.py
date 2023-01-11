@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.special import expit
 
 class MLP:
 
@@ -102,13 +102,9 @@ class MLP:
         return total_cost
 
     def forwardPropagation(self, x):
-        # Define activation function : currently hard-coded as sigmoid function
-        def sigmoid(el):
-            return 1.0 / (1.0 + np.exp(el))
-
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
-            x = np.apply_along_axis(sigmoid, 1, np.add(x @ self.weights[i], self.biases[i]))
+            x = expit(np.add(x @ self.weights[i], self.biases[i])) # apply sigmoid activation
 
         # Return the output of the last-layer
         return x
@@ -120,17 +116,14 @@ class MLP:
         d_weights = [np.zeros(shape=i.shape) for i in self.weights]
         d_biases = [np.zeros(shape=i.shape) for i in self.biases]
 
-        # Define activation function : currently hard-coded as sigmoid function
-        def sigmoid(el):
-            return 1.0 / (1.0 + np.exp(el))
-
+        # Define derivative of activation function : currently hard-coded as the sigmoid derivative function
         def d_sigmoid(el):
             return (1.0 / (1.0 + np.exp(el))) * (1 - (1.0 / (1.0 + np.exp(el))))
 
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
             zs.append(np.add(np.matmul(activations[i], self.weights[i]), self.biases[i]))
-            activations.append(np.apply_along_axis(sigmoid, 1, zs[i]))
+            activations.append(expit(zs[i])) # apply sigmoid activation function
 
         # Define derivative of loss function : currently hard-coded as sigmoid function
         def d_cost(y, pred_y):

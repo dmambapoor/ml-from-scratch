@@ -1,5 +1,6 @@
 # ml-from-scratch
-A project where I code machine learning models using only pandas and numpy.
+A project where I code machine learning models without existing machine learning libraries.
+I only use (numpy matrix operations and scipy sigmoid function).
 
 # Currently Implemented Algorithms
 * **Multi-layer Perceptron**
