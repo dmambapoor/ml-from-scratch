@@ -7,12 +7,16 @@ class MLP:
     def __init__(self):
         pass
 
-    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, max_iterations=100, random_state=None):
+    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, batch_size=None, max_iterations=100, tolerance=1e-4, random_state=None, verbose=False):
         # Determine the sizes of the layers and biases -> add them to the array of layers
         self.n_inputs = x_shape[1]
         self.learning_rate = learning_rate
         self.regularization = regularization
+        self.batch_size = int(x_shape[0]//10) + 1 if (not batch_size) or batch_size > x_shape[0] else batch_size
         self.max_iterations = max_iterations
+        self.tolerance = tolerance
+        self.random_state = random_state
+        self.verbose = verbose
         self.num_layers = 4
         self.weights = []
         self.biases = []
@@ -36,9 +40,9 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False):
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False):
         # Add two hidden layers and one final layer consisting of only one node.
-        self.init_model(x.shape, y.shape, learning_rate, regularization, random_state)
+        self.init_model(x.shape, y.shape, learning_rate=learning_rate, regularization=regularization, batch_size=batch_size, max_iterations=max_iterations, random_state=random_state, verbose=verbose)
 
         # ----MAIN_LEARNING_LOOP-----
 
@@ -46,27 +50,17 @@ class MLP:
         c_cost = self.cost(x, y)
         p_cost = c_cost
         failed_iterations = 0
-        failed_iterations_threshold = 2
+        failed_iterations_threshold = 1000
         failed_iterations_punishment = 2
-        total_failed_iterations = 0
         iteration_num = 0
 
         # Loop gradient descent
-        while c_cost > tolerance and iteration_num < max_iterations:
-            sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
-            sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
-            # Sum all the derivatives of the weights and biases
-            for i in range(len(x)):
-                d_weights, d_biases = self.backPropagation(np.atleast_2d(x[i]), np.atleast_2d(y[i]))
-                for i in range(len(sum_d_weights)):
-                    sum_d_weights[i] += d_weights[i]
-                    sum_d_biases[i] += d_biases[i]
-
-            # Subtract the average of the derivatives above from the weights.
-            # This is gradient descent.
-            for i in range(len(sum_d_weights)):
-                self.weights[i] -= (sum_d_weights[i] / x.shape[0]) * self.learning_rate
-                self.biases[i] -= (sum_d_biases[i] / x.shape[0]) * self.learning_rate
+        while c_cost > self.tolerance and iteration_num < self.max_iterations:
+            # Take a gradient descent step if we're slowing down
+            if p_cost - c_cost < (tolerance / self.max_iterations):
+                self.gradient_descent_step(x, y)
+            else:
+                self.stochastic_gradient_descent_step(x, y)
 
             # Update failure tracking
             p_cost = c_cost
@@ -82,8 +76,6 @@ class MLP:
                 failed_iterations = 0
                 if verbose:
                     print("ITERATION #%i: Failed to improve. Reducing learning rate." % (iteration_num))
-            if total_failed_iterations >= (max_iterations / failed_iterations_threshold):
-                break
 
             # Update iteration number
             iteration_num += 1
@@ -94,6 +86,41 @@ class MLP:
                 print("Max_iterations achieved. Stopping training.")
             elif total_failed_iterations >= (max_iterations / failed_iterations_threshold):
                 print("Failed to improve too many times. Quitting learning.")
+
+    def stochastic_gradient_descent_step(self, x, y):
+        sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
+        sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
+
+        # Sum all the derivatives of the weights and biases
+        rng = np.random.default_rng(seed=self.random_state)
+        for i in range(self.batch_size):
+            select_index = int(rng.random() * len(x))
+            d_weights, d_biases = self.backPropagation(np.atleast_2d(x[select_index]), np.atleast_2d(y[select_index]))
+            for i in range(len(sum_d_weights)):
+                sum_d_weights[i] += d_weights[i]
+                sum_d_biases[i] += d_biases[i]
+
+        # Subtract the average of the derivatives above from the weights.
+        # This is gradient descent.
+        for i in range(len(sum_d_weights)):
+            self.weights[i] -= (sum_d_weights[i] / self.batch_size) * self.learning_rate
+            self.biases[i] -= (sum_d_biases[i] / self.batch_size) * self.learning_rate
+    def gradient_descent_step(self, x, y):
+        sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
+        sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
+
+        # Sum all the derivatives of the weights and biases
+        for i in range(len(x)):
+            d_weights, d_biases = self.backPropagation(np.atleast_2d(x[i]), np.atleast_2d(y[i]))
+            for i in range(len(sum_d_weights)):
+                sum_d_weights[i] += d_weights[i]
+                sum_d_biases[i] += d_biases[i]
+
+        # Subtract the average of the derivatives above from the weights.
+        # This is gradient descent.
+        for i in range(len(sum_d_weights)):
+            self.weights[i] -= (sum_d_weights[i] / x.shape[0]) * self.learning_rate
+            self.biases[i] -= (sum_d_biases[i] / x.shape[0]) * self.learning_rate
 
     def cost(self, x, y):
         total_cost = 0
