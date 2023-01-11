@@ -7,7 +7,9 @@ class MLP:
     def __init__(self):
         pass
 
-    def init_model(self, x_shape, y_shape, learning_rate=1, regularization=1, batch_size=None, max_iterations=100, tolerance=1e-4, random_state=None, verbose=False):
+    def init_model(self, x_shape, y_shape,
+                   learning_rate=1, regularization=1, batch_size=None,
+                   max_iterations=100, tolerance=1e-4, random_state=None, verbose=False):
         # Determine the sizes of the layers and biases -> add them to the array of layers
         self.n_inputs = x_shape[1]
         self.learning_rate = learning_rate
@@ -40,9 +42,13 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False, failed_iterations_threshold=2, failed_iterations_punishment=2):
+    def fit(self, x: np.ndarray, y: np.ndarray,
+            learning_rate=1, regularization=1, batch_size=None, random_state=None,
+            max_iterations=100, tolerance=1e-4, verbose=False, failed_iterations_threshold=2, failed_iterations_punishment=2):
         # Add two hidden layers and one final layer consisting of only one node.
-        self.init_model(x.shape, y.shape, learning_rate=learning_rate, regularization=regularization, batch_size=batch_size, max_iterations=max_iterations, random_state=random_state, verbose=verbose)
+        self.init_model(x.shape, y.shape,
+                        learning_rate=learning_rate, regularization=regularization, batch_size=batch_size,
+                        max_iterations=max_iterations, random_state=random_state, verbose=verbose)
 
         # ----MAIN_LEARNING_LOOP-----
 
@@ -68,7 +74,7 @@ class MLP:
             if c_cost >= p_cost:
                 failed_iterations += 1
             elif failed_iterations >= 1:
-                failed_iterations=0
+                failed_iterations = 0
             if failed_iterations > failed_iterations_threshold:
                 self.learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
@@ -102,6 +108,7 @@ class MLP:
         for i in range(len(sum_d_weights)):
             self.weights[i] -= (sum_d_weights[i] / self.batch_size) * self.learning_rate
             self.biases[i] -= (sum_d_biases[i] / self.batch_size) * self.learning_rate
+
     def gradient_descent_step(self, x, y):
         sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
         sum_d_biases = [np.zeros(shape=i.shape) for i in self.biases]
