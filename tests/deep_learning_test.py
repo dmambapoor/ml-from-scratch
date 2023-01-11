@@ -28,7 +28,7 @@ class Tester:
         x = np.zeros(shape=(2, 150)) + x_shift
         y = np.zeros(shape=(2, 1)) + y_shift
         for i in range(100):
-            model.fit(x, y, max_iterations=100)
+            model.fit(x, y, max_iterations=100, random_state=i)
             if model.cost(x, y) <= tolerance:
                 break
         model.forwardPropagation(x)

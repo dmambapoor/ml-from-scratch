@@ -64,8 +64,8 @@ class MLP:
             # Subtract the average of the derivatives above from the weights.
             # This is gradient descent.
             for i in range(len(sum_d_weights)):
-                self.weights[i] += (sum_d_weights[i] / x.shape[0]) * self.learning_rate
-                self.biases[i] += (sum_d_biases[i] / x.shape[0]) * self.learning_rate
+                self.weights[i] -= (sum_d_weights[i] / x.shape[0]) * self.learning_rate
+                self.biases[i] -= (sum_d_biases[i] / x.shape[0]) * self.learning_rate
 
             # Update failure tracking
             p_cost = c_cost
@@ -81,7 +81,7 @@ class MLP:
                 failed_iterations = 0
                 if verbose:
                     print("ITERATION #%i: Failed to improve. Reducing learning rate." % (iteration_num))
-            if failed_iterations >= (max_iterations / failed_iterations_threshold):
+            if total_failed_iterations >= (max_iterations / failed_iterations_threshold):
                 break
 
             # Update iteration number
@@ -91,7 +91,7 @@ class MLP:
                 print("Cost lower than tolerance. Stopping training.")
             elif iteration_num >= max_iterations:
                 print("Max_iterations achieved. Stopping training.")
-            elif failed_iterations > 1000:
+            elif total_failed_iterations >= (max_iterations / failed_iterations_threshold):
                 print("Failed to improve too many times. Quitting learning.")
 
     def cost(self, x, y):
@@ -102,6 +102,9 @@ class MLP:
         return total_cost
 
     def forwardPropagation(self, x):
+        def sigmoid(el):
+            return expit(el)
+        
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):
             x = expit(np.add(x @ self.weights[i], self.biases[i])) # apply sigmoid activation
@@ -117,8 +120,10 @@ class MLP:
         d_biases = [np.zeros(shape=i.shape) for i in self.biases]
 
         # Define derivative of activation function : currently hard-coded as the sigmoid derivative function
+        def sigmoid(el):
+            return expit(el)
         def d_sigmoid(el):
-            return (1.0 / (1.0 + np.exp(el))) * (1 - (1.0 / (1.0 + np.exp(el))))
+            return expit(el) * (1 - expit(el))
 
         # Given a set of inputs, calculate the output of each layer and feed as inputs to the next layer
         for i in range(len(self.weights)):

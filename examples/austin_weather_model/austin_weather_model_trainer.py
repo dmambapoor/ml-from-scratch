@@ -21,7 +21,7 @@ for col in austin_wdata.columns:
     austin_wdata[col] = austin_wdata[col].apply(lambda x: (x - min_point)/(max_point-min_point))
 
 # Add previous [window_size] days of data to each entry
-window_size = 30
+window_size = 13
 for col in austin_wdata.columns:
     for i in range(window_size):
         austin_wdata["%s_%i" % (col, i+1)] = austin_wdata.shift((i+1))["TMAX"]
@@ -46,7 +46,7 @@ y_train = make_2d(y_train)
 y_test = make_2d(y_test)
 
 model = MLP()
-model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), max_iterations=100, tolerance=1e-4, verbose=True)
+model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), max_iterations=1000, tolerance=1e-4, verbose=True)
 print("TRAIN COST: %f" % (model.cost(np.atleast_2d(x_train), np.atleast_2d(y_train))))
 print("TEST COST: %f" % (model.cost(np.atleast_2d(x_test), np.atleast_2d(y_test))))
 
