@@ -46,7 +46,7 @@ y_train = make_2d(y_train)
 y_test = make_2d(y_test)
 
 model = MLP()
-model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), batch_size=100, max_iterations=1000, tolerance=1e-4, verbose=True)
+model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), batch_size=250, max_iterations=500, tolerance=4e-3, verbose=True)
 print("TRAIN COST: %f" % (model.cost(np.atleast_2d(x_train), np.atleast_2d(y_train))))
 print("TEST COST: %f" % (model.cost(np.atleast_2d(x_test), np.atleast_2d(y_test))))
 

@@ -40,7 +40,7 @@ class MLP:
         self.biases.append(b3)
 
     # Construct and train the multi-layer perceptrons
-    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False, failed_iterations_threshold=1000, failed_iterations_punishment=2):
+    def fit(self, x: np.ndarray, y: np.ndarray, learning_rate=1, regularization=1, batch_size=None, random_state=None, max_iterations=100, tolerance=1e-4, verbose=False, failed_iterations_threshold=2, failed_iterations_punishment=2):
         # Add two hidden layers and one final layer consisting of only one node.
         self.init_model(x.shape, y.shape, learning_rate=learning_rate, regularization=regularization, batch_size=batch_size, max_iterations=max_iterations, random_state=random_state, verbose=verbose)
 
@@ -55,7 +55,7 @@ class MLP:
         # Loop gradient descent
         while c_cost > self.tolerance and iteration_num < self.max_iterations:
             # Take a gradient descent step if we're slowing down
-            if p_cost - c_cost < (tolerance):
+            if c_cost < (tolerance * 2):
                 self.gradient_descent_step(x, y)
             else:
                 self.stochastic_gradient_descent_step(x, y)
