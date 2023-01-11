@@ -69,7 +69,6 @@ class MLP:
                 print("ITERATION #%i COST: %f (change of %f)" % (iteration_num, c_cost, c_cost-p_cost))
             if c_cost >= p_cost:
                 failed_iterations += 1
-                total_failed_iterations += 1
             if failed_iterations > failed_iterations_threshold:
                 self.learning_rate /= failed_iterations_punishment
                 p_cost = c_cost
@@ -84,8 +83,6 @@ class MLP:
                 print("Cost lower than tolerance. Stopping training.")
             elif iteration_num >= max_iterations:
                 print("Max_iterations achieved. Stopping training.")
-            elif total_failed_iterations >= (max_iterations / failed_iterations_threshold):
-                print("Failed to improve too many times. Quitting learning.")
 
     def stochastic_gradient_descent_step(self, x, y):
         sum_d_weights = [np.zeros(shape=i.shape) for i in self.weights]
