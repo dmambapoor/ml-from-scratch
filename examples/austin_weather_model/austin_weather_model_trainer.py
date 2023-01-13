@@ -1,7 +1,7 @@
-import pandas as pd
+import pandas as pd  # type: ignore
 import numpy as np
 from pickle import dump
-from ml_from_scratch.MLP import MLP
+from ml_from_scratch.MLP import MLP  # type: ignore
 
 # Read in the dataset
 austin_wdata = pd.read_csv("./examples/austin_weather_model/noaa_austin_2000_present.csv",
@@ -21,7 +21,7 @@ for col in austin_wdata.columns:
     austin_wdata[col] = austin_wdata[col].apply(lambda x: (x - min_point)/(max_point-min_point))
 
 # Add previous [window_size] days of data to each entry
-window_size = 7
+window_size = 6
 for col in austin_wdata.columns:
     for i in range(window_size):
         austin_wdata["%s_%i" % (col, i+1)] = austin_wdata.shift((i+1))[col]
@@ -46,7 +46,7 @@ y_train = make_2d(y_train)
 y_test = make_2d(y_test)
 
 model = MLP()
-model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), batch_size=100, max_iterations=2000, tolerance=4e-3, failed_iterations_threshold=10, verbose=True)
+model.fit(np.atleast_2d(x_train), np.atleast_2d(y_train), batch_size=100, max_iterations=2000, tolerance=1e-3, failed_iterations_threshold=3, verbose=True)
 print("TRAIN COST: %f" % (model.cost(np.atleast_2d(x_train), np.atleast_2d(y_train))))
 print("TEST COST: %f" % (model.cost(np.atleast_2d(x_test), np.atleast_2d(y_test))))
 

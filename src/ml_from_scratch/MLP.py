@@ -61,7 +61,7 @@ class MLP:
         # Loop gradient descent
         while c_cost > self.tolerance and iteration_num < self.max_iterations:
             # Take a gradient descent step if we're slowing down
-            if c_cost < (tolerance * 2):
+            if c_cost < (tolerance * 2) or (p_cost - c_cost) <= 0:
                 self.gradient_descent_step(x, y)
             else:
                 self.stochastic_gradient_descent_step(x, y)
