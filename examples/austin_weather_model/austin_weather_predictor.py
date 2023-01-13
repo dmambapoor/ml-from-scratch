@@ -26,10 +26,10 @@ for col in austin_wdata.columns:
     austin_wdata[col] = austin_wdata[col].apply(lambda x: (x - min_point)/(max_point-min_point))
 
 # Add previous [window_size] days of data to each entry
-window_size = 6
+window_size = 30
 for col in austin_wdata.columns:
     for i in range(window_size):
-        austin_wdata["%s_%i" % (col, i+1)] = austin_wdata.shift((i+1))["TMAX"]
+        austin_wdata["%s_%i" % (col, i+1)] = austin_wdata.shift((i+1))[col]
 
 # Add target
 austin_wdata["TARGETMAX"] = austin_wdata.shift(-1)["TMAX"]
